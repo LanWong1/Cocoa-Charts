@@ -41,7 +41,7 @@ typedef enum {
 @interface CCSSampleGroupChartDemoViewController (){
     CCSGroupChartData                               *_dayData;
 }
-
+//私有方法
 - (void)loadJSONData: (ChartDataType) chartDataType;
 
 - (void)loadKLineData: (ChartDataType) chartDataType;
@@ -57,7 +57,6 @@ typedef enum {
     
     [self initView];
     [self initAreaChart];
-    
     // 延迟操作执行的代码
     [self loadJSONData:Chart15minData];
 }
@@ -72,12 +71,10 @@ typedef enum {
     if (segmentedControl.selectedSegmentIndex == 0) {
         [self.areachart setHidden:NO];
         [self.groupChart setHidden:YES];
-        
         [self loadTickData];
     }else if (segmentedControl.selectedSegmentIndex == 1) {
         [self.areachart setHidden:YES];
         [self.groupChart setHidden:NO];
-        
         if (!_dayData) {
             [self loadJSONData:Chart15minData];
         }else{
@@ -106,16 +103,18 @@ typedef enum {
     // 设置颜色
     self.segTopChartType.tintColor = [UIColor whiteColor];
     [self.segTopChartType setBackgroundColor:[UIColor whiteColor]];
+    
+    //设置文字属性
     NSDictionary* selectedTextAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:11.0f],
-                                             NSForegroundColorAttributeName: [@"#323232" str2Color]};
-    // 设置文字属性
+                                             NSForegroundColorAttributeName: [@"#323232" str2Color]};//选中字体
     [self.segTopChartType setTitleTextAttributes:selectedTextAttributes forState:UIControlStateSelected];
     NSDictionary* unselectedTextAttributes = @{NSFontAttributeName:[UIFont systemFontOfSize:11.0f],
                                                NSForegroundColorAttributeName: [UIColor lightGrayColor]};
-    [self.segTopChartType setTitleTextAttributes:unselectedTextAttributes forState:UIControlStateNormal];
+    [self.segTopChartType setTitleTextAttributes:unselectedTextAttributes forState:UIControlStateNormal];//未选中字体
     
     [_groupChart setChartDelegate:self];
-    [_groupChart setChartsBackgroundColor:[@"F5F5F5" str2Color]];
+    [_groupChart setChartsBackgroundColor:[UIColor blackColor]]; //[@"F5F5F5" str2Color]];//设置背景色
+    
     [_groupChart setSetting:^{
         CCSChartsSettingViewController *ctrlSetting = [[CCSChartsSettingViewController alloc] init];
         ctrlSetting.ctrlChart = self;
@@ -134,7 +133,7 @@ typedef enum {
 }
 
 - (void)initAreaChart{
-    [self.areachart setBackgroundColor:[@"F5F5F5" str2Color]];
+    [self.areachart setBackgroundColor:[UIColor whiteColor]];//[@"F5F5F5" str2Color]];
     
     self.areachart.lineWidth = 0.5f;
     self.areachart.maxValue = 150000;
@@ -160,7 +159,7 @@ typedef enum {
     
     NSArray *arrNativeData = dicKLineData[@"kLine"];
     
-    arrNativeData = [[arrNativeData reverseObjectEnumerator] allObjects];
+    arrNativeData = [[arrNativeData reverseObjectEnumerator] allObjects];//倒序排列
     
     NSMutableArray *ohlcdDatas = [[NSMutableArray alloc] init];
     for (NSDictionary *dict in arrNativeData) {
@@ -193,23 +192,20 @@ typedef enum {
         NSDictionary *dicTickData = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
                                                                     options:kNilOptions
                                                                       error:nil];
-        
         NSArray *arrNativeData = dicTickData[@"tick"];
-        
         arrNativeData = [[arrNativeData reverseObjectEnumerator] allObjects];
-        
         [self minsDataProcess:arrNativeData];
     });
 }
 
+
+
 - (void)minsDataProcess:(NSArray *)arrData{
     NSMutableArray *linedata = [[NSMutableArray alloc] init];
-    
     NSMutableDictionary *dicMinsData = [[NSMutableDictionary alloc] init];
     for (NSDictionary *dic in arrData) {
         [dicMinsData setObject:dic[@"o"] forKey:[NSString stringWithFormat:@"%@", [dic[@"pt"] dateWithFormat:@"yyyy-MM-ddHH: mm: ss" target:@"HH:mm"]]];
     }
-    
     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
     [numberFormatter setPositiveFormat:@"00"];
     
@@ -224,7 +220,6 @@ typedef enum {
         if (dicMinsData[time]) {
             open = [dicMinsData[time] doubleValue];
         }
-        
         [arrMinsLineData addObject:[[CCSLineData alloc] initWithValue:open * AXIS_CALC_PARM date: time]];
     }
     
@@ -296,13 +291,11 @@ typedef enum {
     
     [self.groupChart setGroupChartData:_dayData];
 }
-
 /**
  * 设置周数据
  */
 - (void)setWeekData:(NSArray *) ohlcvDatas{
     _dayData = [[CCSGroupChartData alloc] initWithCCSOHLCVDDatas:ohlcvDatas];
-    
     [self.groupChart setGroupChartData:_dayData];
 }
 
